@@ -1,35 +1,75 @@
-import { ChangeEvent, FormEvent, useState } from "react";
-import { useAppDispatch } from "../../app/hooks";
-import { UserType, addUserAsync } from "../../features/users/userSlice";
+import { FormEvent, useState } from "react";
+import { useMultiStepForm } from "../../hooks/useMultiStepForm";
+import { AddressForm } from "./AddressDetailsForm";
+import { PersonalDetailsForm } from "./PersonalDetails";
+
+type FormData = {
+  name: string;
+  age: string;
+  sex: string;
+  mobile: string;
+  govtIdType: string;
+  govtId: string;
+  address: string;
+  state: string;
+  city: string;
+  country: string;
+  pincode: string;
+};
+
+const INITIAL_DATA: FormData = {
+  name: "",
+  age: "",
+  sex: "",
+  mobile: "",
+  govtIdType: "",
+  govtId: "",
+  address: "",
+  state: "",
+  city: "",
+  country: "",
+  pincode: "",
+};
 
 export const RegistrationForm = () => {
-  const dispatch = useAppDispatch();
+  const [data, setData] = useState<FormData>(INITIAL_DATA);
 
-  const [formData, setFormData] = useState<UserType>({
-    name: "",
-    age: "",
-  });
+  const updateFields = (fields: Partial<FormData>) => {
+    setData((prev) => {
+      return { ...prev, ...fields };
+    });
+  };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const {
+    step,
+    steps,
+    currentStepIdx,
+    isFirstStep,
+    isLastStep,
+    previous,
+    next,
+  } = useMultiStepForm([
+    <PersonalDetailsForm {...data} updateFields={updateFields} />,
+    <AddressForm {...data} updateFields={updateFields} />,
+  ]);
+  const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    dispatch(addUserAsync(formData));
+    if (!isLastStep) return next();
+    alert(data.name);
   };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
-  };
-
   return (
-    <div className="form">
-      <h3>Form</h3>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Name</label>
-        <input type="text" id="name" onChange={handleChange} />
-        <br />
-        <label htmlFor="age">Age</label>
-        <input type="number" id="age" onChange={handleChange} />
-        <button>Submit</button>
+    <div className="App">
+      <form onSubmit={onSubmit}>
+        <p>
+          {currentStepIdx + 1} / {steps.length}{" "}
+        </p>
+        <p>{step}</p>
+        {!isFirstStep && (
+          <button type="button" onClick={previous}>
+            Back
+          </button>
+        )}
+        <button type="submit">{isLastStep ? "Submit" : "Next"}</button>
       </form>
     </div>
   );

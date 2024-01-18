@@ -1,10 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export type UserType = {
-  name: string;
-  age: string;
-};
-
+import { UserType } from "../../types/user.types";
 export interface userState {
   status: "idle" | "loading" | "failed" | "success";
   users: UserType[];
@@ -18,8 +14,17 @@ const initialState: userState = {
 export const fetchUsersAsync = createAsyncThunk("users/getUsers", () => {
   const response = [
     {
-      name: "amlan",
-      age: "23",
+      name: "Bob",
+      age: "35",
+      sex: "Male",
+      mobile: "9876543210",
+      govtIdType: "Aadhaar",
+      govtId: "ABCD1234567890",
+      address: "254 B Street, Bangalore",
+      state: "Karnataka",
+      city: "Bangalore",
+      country: "India",
+      pincode: "560043",
     },
   ];
 
